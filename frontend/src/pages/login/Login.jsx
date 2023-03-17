@@ -1,73 +1,68 @@
-import React, { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const Navigate = useNavigate();
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    console.log(email, password);
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("password", password);
-    const response = await axios.post("http://localhost:5000/login", formData);
-    console.log(response);
-    if (response.status === 404 || !response.data) {
-      console.log("invalid user");
-    } else {
-      //   storing token in local storage
-      localStorage.setItem("data", JSON.stringify(response.data.data));
-      Navigate("/");
-    }
-    setEmail("");
-    setPassword("");
+  const navigate = useNavigate();
+
+  const userLogin = async function (event) {
+    event.preventDefault();
+    axios
+      .post("http://localhost:8000/login", {
+        email,
+        password,
+      })
+      .then((res) => {
+        alert(`Your Acount Login Succesfully`);
+        const token = res.data.token;
+        const userId = res.data.userId;
+        localStorage.setItem("x-api-key", token);
+        localStorage.setItem("userId", userId);
+
+        navigate("/GetBooks");
+      })
+      .catch((err) => {
+        alert(err.response.data.message + err.response.status + " Error");
+      });
   };
   return (
     <>
-      <div className="container">
-        <div>
-          <div className="row">
-            <div className="col-md-6">
-              <card className="card p-5 m-5">
-                <form>
-                  <div>
-                    <input
-                      className="form-control w-full mb-5"
-                      type="email"
-                      name="email"
-                      required
-                      placeholder="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    ></input>
-                    <input
-                      className="form-control w-full mb-3"
-                      type="password"
-                      name="password"
-                      required
-                      placeholder="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    ></input>
-                    <button
-                      type="submit"
-                      className="btn bg-primary text-white"
-                      onClick={submitHandler}
-                    >
-                      Login
-                    </button>
-                  </div>
-                </form>
-              </card>
-            </div>
-            {/* <div className='col-md-6'>Ru</div> */}
-          </div>
+      <div className="row m-3">
+        <div className="col">
+          <img
+            src="https://source.unsplash.com/random/1920x1080/?books"
+            width="800"
+            height="680"
+            alt="bg"
+          />
+        </div>
+        <div className="col m-5">
+          <form onSubmit={userLogin}>
+            <br />
+            <br />
+            <br />
+            <h1>Login</h1>
+            <input
+              type="email"
+              placeholder="Email id"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <br />
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />{" "}
+            <br />
+            <input className="btn btn-primary" type="submit" />
+            <br />
+          </form>
         </div>
       </div>
     </>
   );
-};
+}
 
 export default Login;
